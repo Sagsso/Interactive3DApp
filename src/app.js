@@ -134,6 +134,7 @@ function initScene() {
     plane.position.y = -5;
     plane.receiveShadow = true;
     scene.add(plane);
+    collidableList.push(plane);
 
 
     // Big
@@ -285,7 +286,7 @@ function updateScene() {
     //Player controls
     for (const player of Object.keys(players)) {
         if (players[player] != null) {
-            players[player].control.update();
+            players[player].updateControls();
             players[player].collidableBox.update(players[player].control);
         }
     }

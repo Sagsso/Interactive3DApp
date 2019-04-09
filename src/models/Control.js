@@ -1,13 +1,17 @@
 class Control {
     //myControl = new Control("w","d","s","a");
-    constructor(up, right, down, left) {
+    constructor(up, right, down, left, jump) {
         this.initControls();
         this.up = up || "w";
         this.right = right || "d";
         this.down = down || "s";
         this.left = left || "a";
         this.velocity = 2;
+        this.jump = jump || " ";
 
+        this.isInAir = false;
+        this.isFalling = false;
+        this.isJumping = false;
         this.element = null;
 
         this.initListeners();
@@ -45,11 +49,20 @@ class Control {
         return this._left.key;
     }
 
+    set jump(key) {
+        this._jump.key = key;
+    }
+
+    get jump() {
+        return this._jump.key;
+    }
+
     initControls() {
         this._up = { key: "", isPressed: false };
         this._right = { key: "", isPressed: false };
         this._down = { key: "", isPressed: false };
         this._left = { key: "", isPressed: false };
+        this._jump = { key: "", isPressed: false };
     }
 
     initListeners() {
@@ -57,7 +70,12 @@ class Control {
 
     }
 
-    update() {
+    update(vx, vy, m, jf) {
+        this.vx = vx;
+        this.vy = vy;
+        this.m = m;
+        this.jumpForce = jf;
+
         if (this._up.isPressed) {
             this.element.position.z -= this.velocity;
         }
@@ -69,6 +87,13 @@ class Control {
         }
         if (this._left.isPressed) {
             this.element.position.x -= this.velocity;
+        }
+        if (this._jump.isPressed) {
+            console.log(`is Jumping: ${this.isJumping} and is In Air: ${this.isInAir}`)
+            if (!this.isJumping && !this.isInAir) {
+                this.isJumping = true;
+                this.element.position.y += this.jumpForce;
+            }
         }
     }
 
@@ -84,6 +109,9 @@ class Control {
     pressLeft() {
         this._left.isPressed = true;
     }
+    pressJump() {
+        this._jump.isPressed = true;
+    }
 
     releaseUp() {
         this._up.isPressed = false;
@@ -96,6 +124,9 @@ class Control {
     }
     releaseLeft() {
         this._left.isPressed = false;
+    }
+    releaseJump() {
+        this._jump.isPressed = false;
     }
 
 }
@@ -116,35 +147,35 @@ document.onkeydown = (e) => {
     mySound3D4.play();
 
     //cámara default
-    if (e.key == "z") {
+    if (e.key == "1") {
         console.log('Camera default puesta');
         resetIsCurrent(cameras);//Aquí todas las cámaras tiene isCurren = false;
         cameras.default.isCurrent = true;//Aquí la default isCurrent
         cameras.current.cam = cameras.default.cam;
         cameraControl = new THREE.OrbitControls(cameras.current.cam, renderer.domElement);
     }
-    if (e.key == "x") {
+    if (e.key == "2") {
         console.log('Camera camera2 puesta');
         cameras.current.cam = cameras.camera2.cam;//Aquí todas las cámaras tiene isCurren = false;
         resetIsCurrent(cameras);//Aquí la cámara 2 es la incurrent
         cameras.camera2.isCurrent = true;
         cameraControl = new THREE.OrbitControls(cameras.current.cam, renderer.domElement);
     }
-    if (e.key == "c") {
+    if (e.key == "3") {
         console.log('Camera camera3 puesta');
         cameras.current.cam = cameras.camera3.cam;//Aquí todas las cámaras tiene isCurren = false;
         resetIsCurrent(cameras);//Aquí la cámara 3 es la incurrent
         cameras.camera3.isCurrent = true;
         cameraControl = new THREE.OrbitControls(cameras.current.cam, renderer.domElement);
     }
-    if (e.key == "v") {
+    if (e.key == "4") {
         console.log('Camera camera4 puesta');
         cameras.current.cam = cameras.camera4.cam;//Aquí todas las cámaras tiene isCurren = false;
         resetIsCurrent(cameras);//Aquí la cámara 3 es la incurrent
         cameras.camera4.isCurrent = true;
         cameraControl = new THREE.OrbitControls(cameras.current.cam, renderer.domElement);
     }
-    if (e.key == "b") {
+    if (e.key == "5") {
         console.log('Camera camera5 puesta');
         cameras.current.cam = cameras.camera5.cam;//Aquí todas las cámaras tiene isCurren = false;
         resetIsCurrent(cameras);//Aquí la cámara 3 es la incurrent
@@ -169,6 +200,9 @@ document.onkeydown = (e) => {
                 break;
             case elControl.left:
                 elControl.pressLeft();
+                break;
+            case elControl.jump:
+                elControl.pressJump();
                 break;
         }
 
@@ -198,6 +232,9 @@ document.onkeyup = (e) => {
                 break;
             case elControl.left:
                 elControl.releaseLeft();
+                break;
+            case elControl.jump:
+                elControl.releaseJump();
                 break;
         }
     }

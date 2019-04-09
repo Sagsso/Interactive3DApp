@@ -6,6 +6,11 @@ class Player {
         this.element = element;
         this.label = this.getLabel();
         this.radius = 5;
+
+        this.vy = 0;
+        this.vx = 2;
+        this.m = 2;
+
         if ("label" in ap) {
             if (ap.label) {
                 this.showLabel();
@@ -22,6 +27,8 @@ class Player {
             var object1 = new THREE.Mesh(geometry, material);
             object1.castShadow = true;
             object1.receiveShadow = true;
+            object1.position.y += 1 / 2;
+            console.log(object1.position);
             this._element = object1;
         }
         this.control.element = this._element;
@@ -29,6 +36,10 @@ class Player {
 
     get element() {
         return this._element;
+    }
+
+    updateControls() {
+        this.control.update(this.vx, this.vy, this.m, 20);
     }
 
     getLabel() {
